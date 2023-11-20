@@ -1,15 +1,51 @@
-use std::{ops::{Index, Range, RangeFrom, RangeTo}, fmt::Display};
+use std::{
+    fmt::Display,
+    ops::{Index, Range, RangeFrom, RangeTo},
+};
 
 pub struct IndexableStr<'a> {
     str: &'a str,
-    char_vec: Vec<char>, 
+    char_vec: Vec<char>,
+    offsets_vec: Vec<usize>,
 }
 
 impl<'a> IndexableStr<'a> {
     pub fn new(str: &'a str) -> IndexableStr {
-        IndexableStr { 
-            str, 
-            char_vec: str.chars().collect(),
+        let char_vec = str.chars().collect();
+
+        let mut offsets_vec = Vec::<usize>::new();
+        let mut current_offset: usize = 0;
+
+        for c in &char_vec {
+            offsets_vec.push(current_offset);
+
+            let code_point: u32 = *(c as &char) as u32;
+
+            current_offset += (|| {
+                if code_point <= 0x7F {
+                    return 1;
+                }
+
+                if code_point <= 0x7FF {
+                    return 2;
+                }
+
+                if code_point <= 0xFFFF {
+                    return 3;
+                }
+
+                if code_point <= 0x10FFFF {
+                    return 4;
+                }
+
+                0
+            })();
+        }
+
+        IndexableStr {
+            str,
+            char_vec,
+            offsets_vec,
         }
     }
 
@@ -40,7 +76,10 @@ impl<'a> Index<Range<usize>> for IndexableStr<'a> {
     type Output = str;
 
     fn index(&self, range: Range<usize>) -> &str {
-        &self.str[range]
+        let start_index: usize = self.offsets_vec[range.start];
+        let end_index: usize = self.offsets_vec[range.end - 1];
+
+        &self.str[start_index..=end_index]
     }
 }
 
@@ -48,65 +87,70 @@ impl<'a> Index<RangeFrom<usize>> for IndexableStr<'a> {
     type Output = str;
 
     fn index(&self, index: RangeFrom<usize>) -> &Self::Output {
-        &self.str[index.start..self.str.len()]
-    } 
+        let start_index: usize = self.offsets_vec[index.start];
+        let end_index: usize = self.offsets_vec[self.offsets_vec.len() - 1];
+
+        &self.str[start_index..=end_index]
+    }
 }
 
 impl<'a> Index<RangeTo<usize>> for IndexableStr<'a> {
     type Output = str;
 
     fn index(&self, index: RangeTo<usize>) -> &Self::Output {
-        &self.str[0..index.end]
-    } 
+        let end_index: usize = self.offsets_vec[index.end - 1];
+
+        &self.str[0..=end_index]
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
     #[test]
     fn test_as_str_works() {
-        let s = IndexableStr::new("0123456789");
+        let s = IndexableStr::new("0😀23456789");
 
-        assert_eq!(s.as_str(), "0123456789");
+        assert_eq!(s.as_str(), "0😀23456789");
     }
 
     #[test]
     fn test_len_works() {
-        let s = IndexableStr::new("0123456789");
+        let s = IndexableStr::new("0😀23456789");
 
         assert_eq!(s.len(), 10);
     }
 
     #[test]
     fn test_to_string_works() {
-        let s = IndexableStr::new("0123456789");
+        let s = IndexableStr::new("0😀23456789");
 
-        assert_eq!(s.to_string(), "0123456789");
+        assert_eq!(s.to_string(), "0😀23456789");
     }
     #[test]
     fn test_index_works() {
-        let s = IndexableStr::new("0123456789");
+        let s = IndexableStr::new("0😀23456789");
 
-        assert_eq!(s[2], '2');
+        assert_eq!(s[1], '😀');
     }
     #[test]
     fn test_range_works() {
-        let s = IndexableStr::new("0123456789");
+        let s = IndexableStr::new("0😀23456789");
 
-        assert_eq!(&s[1..9], "12345678");
+        assert_eq!(&s[1..9], "😀2345678");
     }
     #[test]
     fn test_range_from_works() {
-        let s = IndexableStr::new("0123456789");
+        let s = IndexableStr::new("0😀23456789");
 
-        assert_eq!(&s[1..], "123456789");
+        assert_eq!(&s[1..], "😀23456789");
     }
     #[test]
     fn test_range_to_works() {
-        let s = IndexableStr::new("0123456789");
+        let s = IndexableStr::new("0😀23456789");
+        println!("length: {}", s.as_str().len());
 
-        assert_eq!(&s[..9], "012345678");
+        assert_eq!(&s[..9], "0😀2345678");
     }
-}    
+}
