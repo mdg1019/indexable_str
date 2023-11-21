@@ -9,6 +9,29 @@ struct CharOffset {
     offset: usize,
 }
 
+/// `IndexableStr` is a `struct` for creating immutable string objects that make text parsing with Rust a bit more elegant.
+/// 
+/// `IndexableStr` can be used to retrieve a `char` from a specified index as follows:
+/// ```
+/// use indexable_str::IndexableStr;
+/// 
+/// let s = IndexableStr::new("0😀2345678😀");
+/// 
+/// assert_eq!(s[1], '😀');
+/// ```
+/// 
+/// `IndexableStr` also allows creating `str`s over a range of `char`s as follows:
+/// ```
+/// use indexable_str::IndexableStr;
+/// 
+/// let s = IndexableStr::new("0😀2345678😀");
+/// 
+/// assert_eq!(&s[1..9], "😀2345678")
+/// ```
+/// 
+/// `IndexableStr` is designed to work well with all valid UTF-8 characters. 
+/// 
+/// You should note that `IndexableStr` creates a vector of objects that holds a `char` and the starting byte offset of the `char`'s position in the underlying string as a `usize`. This requires additional memory resources. However, the convenience of `IndexableStr` should outweigh the additional memory requirements for most applications.
 pub struct IndexableStr<'a> {
     str: &'a str,
     str_length: usize,
@@ -17,6 +40,16 @@ pub struct IndexableStr<'a> {
 }
 
 impl<'a> IndexableStr<'a> {
+    /// Parameters:
+    /// 
+    /// &nbsp;&nbsp;&nbsp;&nbsp;`str: &'a str`&nbsp;&nbsp;&nbsp;&nbsp;is the string to be made indexable.
+    /// 
+    /// Returns an `IndexableStr` object for the specified `str` argument.
+    /// ```
+    /// use indexable_str::IndexableStr;
+    /// 
+    /// let s = IndexableStr::new("0😀2345678😀");
+    /// ```
     pub fn new(str: &'a str) -> IndexableStr {
         let mut current_offset: usize = 0;
 
@@ -61,12 +94,28 @@ impl<'a> IndexableStr<'a> {
         }
     }
 
+    /// Returns an `&'a str` for the underlying string as follows.
+    /// ```
+    /// use indexable_str::IndexableStr;
+    /// 
+    /// let s = IndexableStr::new("0😀2345678😀");
+    /// 
+    /// assert_eq!(s.as_str(), "0😀2345678😀");
+    /// ```
     pub fn as_str(&self) -> &'a str {
         self.str
     }
 
+    /// Returns a `usize` for the number of `char`s in the string.
+    /// ```
+    /// use indexable_str::IndexableStr;
+    /// 
+    /// let s = IndexableStr::new("0😀2345678😀");
+    /// 
+    /// assert_eq!(s.len(), 10);
+    /// ```
     pub fn len(&self) -> usize {
-        self.chars_vec.len()
+        self.chars_length
     }
 
     fn create_str_from_range(&self, start_index: usize, end_index: usize) -> &str {
@@ -102,6 +151,7 @@ impl<'a> Index<usize> for IndexableStr<'a> {
     }
 }
 
+/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
 impl<'a> Index<Range<usize>> for IndexableStr<'a> {
     type Output = str;
 
@@ -110,6 +160,7 @@ impl<'a> Index<Range<usize>> for IndexableStr<'a> {
     }
 }
 
+/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
 impl<'a> Index<RangeFrom<usize>> for IndexableStr<'a> {
     type Output = str;
 
@@ -118,6 +169,7 @@ impl<'a> Index<RangeFrom<usize>> for IndexableStr<'a> {
     }
 }
 
+/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
 impl<'a> Index<RangeTo<usize>> for IndexableStr<'a> {
     type Output = str;
 
