@@ -12,7 +12,7 @@ description = "A library for creating indexable strings"
 repository = "https://github.com/mdg1019/indexable_str"
 documentation = "https://mdg1019.github.io/indexable_str/index.html"
 homepage = "https://github.com/mdg1019/indexable_str"
-keywords = ["indexablestr", "index", "indexable", "string", "parse", "parsing"]
+keywords = ["index", "indexable", "string", "parse", "parsing"]
 license = "MIT"
 readme = "README.md"
 
