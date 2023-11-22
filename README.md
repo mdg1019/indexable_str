@@ -1,6 +1,6 @@
 # indexable_str
 
-This Rust library features the `IndexableStr` struct. To better understand how strings work in Rust, I decided to create a personal project that parses JSON files. When creating the lexer, I tried a number of ways to correctly index a string to retrieve string slices and `char`s. Once I finally started to wrap my head around Rust strings and lifetimes, I finally created a simple version of `IndexableStr`. I found it very convenient to use and it had a bonus of making my code far more readable than the hacky approaches I'd previously tried. Because others may find it useful too, I decided to split `IndexableStr` into a separate library project.
+This Rust library features the `IndexableStr` struct. To better understand how strings work in Rust, I decided to create a personal project that parses JSON files. When creating the lexer, I tried a number of ways to correctly index a string to retrieve string slices and `char`s. Once I finally started to wrap my head around Rust strings and lifetimes, I created a simple version of `IndexableStr`. I found it very convenient to use and it had a bonus of making my code far more readable than the hacky approaches I'd previously tried. Because others may find it useful too, I decided to split `IndexableStr` into a separate library project.
 
 See the <a href="https://mdg1019.github.io/indexable_str/doc/indexable_str/index.html" target="_blank">rustdoc file</a> for the api details.
 
