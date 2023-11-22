@@ -3,6 +3,25 @@ name = "indexable_str"
 version = "0.1.0"
 edition = "2021"
 
+
+authors = [
+  "Mark Goodwin <m0good04@gmail.com",
+]
+
+description = "A library for creating indexable strings"
+repository = "https://github.com/mdg1019/indexable_str"
+documentation = "https://mdg1019.github.io/indexable_str/index.html"
+homepage = "https://github.com/mdg1019/indexable_str"
+keywords = ["indexablestr", "index", "indexable", "string", "parse", "parsing"]
+license = "MIT"
+readme = "README.md"
+
+exclude = [
+  "doc/*",
+  "build_docs.sh",
+  "index.html",
+]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
