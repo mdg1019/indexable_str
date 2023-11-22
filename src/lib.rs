@@ -1,3 +1,5 @@
+#![crate_name = "indexable_str"]
+
 use std::{
     fmt::Display,
     ops::{Index, Range, RangeFrom, RangeTo},
@@ -11,8 +13,9 @@ struct CharOffset {
 
 /// `IndexableStr` is a `struct` for creating immutable string objects that make text parsing with Rust a bit more elegant.
 /// 
-/// `IndexableStr` can be used to retrieve a `char` from a specified index as follows:
+/// # Examples
 /// ```
+/// // Gets a char from a specified index.
 /// use indexable_str::IndexableStr;
 /// 
 /// let s = IndexableStr::new("0😀2345678😀");
@@ -20,13 +23,56 @@ struct CharOffset {
 /// assert_eq!(s[1], '😀');
 /// ```
 /// 
-/// `IndexableStr` also allows creating `str`s over a range of `char`s as follows:
-/// ```
+///  ```
+/// // Gets a string slice from a specified range.
 /// use indexable_str::IndexableStr;
 /// 
 /// let s = IndexableStr::new("0😀2345678😀");
 /// 
 /// assert_eq!(&s[1..9], "😀2345678")
+/// ```
+/// 
+/// ```
+/// // Parses a string of signed integers, which are separated by whitespace
+/// use regex::Regex;
+/// use indexable_str::IndexableStr;
+///   
+/// let text = IndexableStr::new("0 1 2\n  -11  -12  -13\n");
+/// let signed_integer_pattern: Regex = Regex::new(r#"\b(0)|(-?[1-9]\d*)\b"#).unwrap();
+/// let mut signed_integer_vec: Vec<i64> = Vec::new();
+/// let mut cursor: usize = 0;
+///  
+/// while cursor < text.len() {
+///    let c = text[cursor];
+/// 
+///     match c {
+///         ' ' | '\t' | '\r' | '\n' => {
+///             cursor += 1;
+///             continue;
+///         },
+///         _=> (), 
+///     }
+/// 
+///     if let Some(captures) = signed_integer_pattern.captures(&text[cursor..]) {
+///         let num_string = captures[0].to_string();
+///         let num = num_string.parse::<i64>();
+///         signed_integer_vec.push(num.unwrap());
+/// 
+///         cursor += num_string.len();
+///
+///         continue;
+///     }
+/// 
+///     panic!("Unexpected character '{}' at position ({})!", c, cursor);
+/// }
+///  
+/// assert_eq!(signed_integer_vec.len(), 6);
+/// assert_eq!(signed_integer_vec[0], 0);
+/// assert_eq!(signed_integer_vec[1], 1);
+/// assert_eq!(signed_integer_vec[2], 2);
+/// assert_eq!(signed_integer_vec[3], -11);
+/// assert_eq!(signed_integer_vec[4], -12);
+/// assert_eq!(signed_integer_vec[5], -13);
 /// ```
 /// 
 /// `IndexableStr` is designed to work well with all valid UTF-8 characters. 
@@ -40,11 +86,11 @@ pub struct IndexableStr<'a> {
 }
 
 impl<'a> IndexableStr<'a> {
-    /// Parameters:
+    /// Returns an indexable string.
+    /// # Arguments
     /// 
-    /// &nbsp;&nbsp;&nbsp;&nbsp;`str: &'a str`&nbsp;&nbsp;&nbsp;&nbsp;is the string to be made indexable.
-    /// 
-    /// Returns an `IndexableStr` object for the specified `str` argument.
+    /// * `str` - A string slice to be indexed.
+    /// # Examples
     /// ```
     /// use indexable_str::IndexableStr;
     /// 
@@ -94,7 +140,9 @@ impl<'a> IndexableStr<'a> {
         }
     }
 
-    /// Returns an `&'a str` for the underlying string as follows.
+    /// Returns the original string slice.
+    /// 
+    /// # Examples
     /// ```
     /// use indexable_str::IndexableStr;
     /// 
@@ -107,6 +155,8 @@ impl<'a> IndexableStr<'a> {
     }
 
     /// Returns a `usize` for the number of `char`s in the string.
+    /// 
+    /// # Examples
     /// ```
     /// use indexable_str::IndexableStr;
     /// 
@@ -151,7 +201,9 @@ impl<'a> Index<usize> for IndexableStr<'a> {
     }
 }
 
-/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
+/// # Panics
+/// * If the range end is greater than the number of characters in the string.
+/// * If the range end is less than the range start.
 impl<'a> Index<Range<usize>> for IndexableStr<'a> {
     type Output = str;
 
@@ -160,7 +212,10 @@ impl<'a> Index<Range<usize>> for IndexableStr<'a> {
     }
 }
 
-/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
+
+
+/// # Panics
+/// * If the range end is less than the range start.
 impl<'a> Index<RangeFrom<usize>> for IndexableStr<'a> {
     type Output = str;
 
@@ -169,7 +224,10 @@ impl<'a> Index<RangeFrom<usize>> for IndexableStr<'a> {
     }
 }
 
-/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
+
+
+/// # Panics
+/// * If the range end is greater than the number of characters in the string.
 impl<'a> Index<RangeTo<usize>> for IndexableStr<'a> {
     type Output = str;
 

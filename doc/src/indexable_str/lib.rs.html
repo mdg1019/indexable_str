@@ -253,7 +253,67 @@
 <a href="#253" id="253">253</a>
 <a href="#254" id="254">254</a>
 <a href="#255" id="255">255</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+</pre></div><pre class="rust"><code><span class="attr">#![crate_name = <span class="string">&quot;indexable_str&quot;</span>]
+
+</span><span class="kw">use </span>std::{
     fmt::Display,
     ops::{Index, Range, RangeFrom, RangeTo},
 };
@@ -266,8 +326,9 @@
 
 <span class="doccomment">/// `IndexableStr` is a `struct` for creating immutable string objects that make text parsing with Rust a bit more elegant.
 /// 
-/// `IndexableStr` can be used to retrieve a `char` from a specified index as follows:
+/// # Examples
 /// ```
+/// // Gets a char from a specified index.
 /// use indexable_str::IndexableStr;
 /// 
 /// let s = IndexableStr::new(&quot;0😀2345678😀&quot;);
@@ -275,13 +336,56 @@
 /// assert_eq!(s[1], &#39;😀&#39;);
 /// ```
 /// 
-/// `IndexableStr` also allows creating `str`s over a range of `char`s as follows:
-/// ```
+///  ```
+/// // Gets a string slice from a specified range.
 /// use indexable_str::IndexableStr;
 /// 
 /// let s = IndexableStr::new(&quot;0😀2345678😀&quot;);
 /// 
 /// assert_eq!(&amp;s[1..9], &quot;😀2345678&quot;)
+/// ```
+/// 
+/// ```
+/// // Parses a string of signed integers, which are separated by whitespace
+/// use regex::Regex;
+/// use indexable_str::IndexableStr;
+///   
+/// let text = IndexableStr::new(&quot;0 1 2\n  -11  -12  -13\n&quot;);
+/// let signed_integer_pattern: Regex = Regex::new(r#&quot;\b(0)|(-?[1-9]\d*)\b&quot;#).unwrap();
+/// let mut signed_integer_vec: Vec&lt;i64&gt; = Vec::new();
+/// let mut cursor: usize = 0;
+///  
+/// while cursor &lt; text.len() {
+///    let c = text[cursor];
+/// 
+///     match c {
+///         &#39; &#39; | &#39;\t&#39; | &#39;\r&#39; | &#39;\n&#39; =&gt; {
+///             cursor += 1;
+///             continue;
+///         },
+///         _=&gt; (), 
+///     }
+/// 
+///     if let Some(captures) = signed_integer_pattern.captures(&amp;text[cursor..]) {
+///         let num_string = captures[0].to_string();
+///         let num = num_string.parse::&lt;i64&gt;();
+///         signed_integer_vec.push(num.unwrap());
+/// 
+///         cursor += num_string.len();
+///
+///         continue;
+///     }
+/// 
+///     panic!(&quot;Unexpected character &#39;{}&#39; at position ({})!&quot;, c, cursor);
+/// }
+///  
+/// assert_eq!(signed_integer_vec.len(), 6);
+/// assert_eq!(signed_integer_vec[0], 0);
+/// assert_eq!(signed_integer_vec[1], 1);
+/// assert_eq!(signed_integer_vec[2], 2);
+/// assert_eq!(signed_integer_vec[3], -11);
+/// assert_eq!(signed_integer_vec[4], -12);
+/// assert_eq!(signed_integer_vec[5], -13);
 /// ```
 /// 
 /// `IndexableStr` is designed to work well with all valid UTF-8 characters. 
@@ -295,11 +399,11 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IndexableStr&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="doccomment">/// Parameters:
+    <span class="doccomment">/// Returns an indexable string.
+    /// # Arguments
     /// 
-    /// &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;`str: &amp;&#39;a str`&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;is the string to be made indexable.
-    /// 
-    /// Returns an `IndexableStr` object for the specified `str` argument.
+    /// * `str` - A string slice to be indexed.
+    /// # Examples
     /// ```
     /// use indexable_str::IndexableStr;
     /// 
@@ -349,7 +453,9 @@
         }
     }
 
-    <span class="doccomment">/// Returns an `&amp;&#39;a str` for the underlying string as follows.
+    <span class="doccomment">/// Returns the original string slice.
+    /// 
+    /// # Examples
     /// ```
     /// use indexable_str::IndexableStr;
     /// 
@@ -362,6 +468,8 @@
     }
 
     <span class="doccomment">/// Returns a `usize` for the number of `char`s in the string.
+    /// 
+    /// # Examples
     /// ```
     /// use indexable_str::IndexableStr;
     /// 
@@ -406,7 +514,9 @@
     }
 }
 
-<span class="doccomment">/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
+<span class="doccomment">/// # Panics
+/// * If the range end is greater than the number of characters in the string.
+/// * If the range end is less than the range start.
 </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Index&lt;Range&lt;usize&gt;&gt; <span class="kw">for </span>IndexableStr&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">type </span>Output = str;
 
@@ -415,7 +525,10 @@
     }
 }
 
-<span class="doccomment">/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
+
+
+<span class="doccomment">/// # Panics
+/// * If the range end is less than the range start.
 </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Index&lt;RangeFrom&lt;usize&gt;&gt; <span class="kw">for </span>IndexableStr&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">type </span>Output = str;
 
@@ -424,7 +537,10 @@
     }
 }
 
-<span class="doccomment">/// **Panic Alert**: Range operations will panic if the range end is greater than the number of `char`s in the string or the range end is less than the range start.
+
+
+<span class="doccomment">/// # Panics
+/// * If the range end is greater than the number of characters in the string.
 </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Index&lt;RangeTo&lt;usize&gt;&gt; <span class="kw">for </span>IndexableStr&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">type </span>Output = str;
 

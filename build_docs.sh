@@ -1,3 +1,3 @@
 #!/bin/bash
-rustdoc src/lib.rs --crate-name indexable_str
+rustdoc src/lib.rs
 echo "<meta http-equiv=\"refresh\" content=\"0; url=doc/indexable_str/index.html\">" > ./index.html
